@@ -1,0 +1,5 @@
+data/
+.vscode
+deployment/assets/database/*
+
+!deployment/assets/database/.gitkeep

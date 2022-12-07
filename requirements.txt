@@ -1,0 +1,14 @@
+matplotlib
+numpy
+opencv-python
+Pillow
+PyYAML
+scikit-image
+scipy
+seaborn
+streamlit
+streamlit-webrtc
+thop
+torch
+torchvision
+tqdm
