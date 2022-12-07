@@ -3,3 +3,4 @@ data/
 deployment/assets/database/*
 
 !deployment/assets/database/.gitkeep
+!data/.gitkeep
