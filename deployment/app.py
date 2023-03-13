@@ -15,10 +15,6 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageEnhance
 from face_recognition.facenet import *
 from streamlit_webrtc import webrtc_streamer, RTCConfiguration, WebRtcMode
-# from face_detection.predict import predict as detect
-# from face_detection.predict import ssd_predict, yoloface_predict
-# from image_enhacement.srgan.tools.predict import predict as enhance
-# from image_alignment.alignment import align_image
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
@@ -58,34 +54,29 @@ def main(img, get_ax=False):
         return json.load(open(f"deployment/assets/info/{name}.json", 'r'))
 
 def app():
-    """Face Recognition App"""
+    """Приложение для распознавания лиц"""
 
-    st.title("Face Recognition App")
-    st.text("Build with Streamlit & Deep learning algorithms")
+    st.title("Приложение для распознавания лиц")
+    st.text("Создавать с помощью Streamlit и глубокого обучения")
 
-    activities = ["About", "Upload", "Recognition", "Realtime Webcam Recognition"]
-    choice = st.sidebar.selectbox("Select Activity", activities)
+    activities = ["Обо мне", "Загрузить данные", "Распознавания", "Распознавание веб-камеры в реальном времени"]
+    choice = st.sidebar.selectbox("Выберите действие", activities)
 
-    if choice == 'About':
-        st.subheader("Face Authentication App")
+    if choice == 'Обо мне':
+        st.subheader("Приложение для аутентификации по лицу и голосу")
         st.markdown(
-            "Built with Streamlit by [Truong Son](https://github.com/vuongtruongson99). The web appplication allows to add user to database and verfify them later. Also, we provide solutions for face anti-spoofing and face sentiment analysis ...")
-        # st.subheader("Team members:")
-        # members = ''' 
-        #     Pham Hung Manh\n
-        #     Doan Ngoc Phu\n
-        #     Do Van Dai\n
-        #     Ha Bao Anh\n
-        #     Nguyen Xuan Hoang\n'''
-        # st.markdown(members)
-        # st.success("Max Ph")
+            "Создан с помощью Streamlit [Truong Son](https://github.com/vuongtruongson99). Веб-приложение позволяет добавить пользователя в базу данных и проверить его позже.")
+        st.subheader("Студент:")
+        members = ''' 
+            **Выонг Чыонг Шон** - ИКБО-05-19\n'''
+        st.markdown(members)
     
-    elif choice == 'Upload':
-        st.subheader("Add your face to database")
-        user_name = st.text_input("Enter your name:")
-        user_dob = st.date_input("Enter your date of birth:", min_value=datetime.date(1940, 1, 1))
-        user_code = st.text_input("Enter your code:")
-        image = st.camera_input("Take a picture")
+    elif choice == 'Загрузить данные':
+        st.subheader("Добавьте свое лицо в базу данных")
+        user_name = st.text_input("Ваше имя:")
+        user_dob = st.date_input("Дата рождения:", min_value=datetime.date(1940, 1, 1))
+        user_code = st.text_input("Личный код:")
+        image = st.camera_input("Сделать фото")
 
         if image is not None:
             image = Image.open(image).convert('RGB')
@@ -100,7 +91,7 @@ def app():
 
             # Count number of user in database
             user_counts = len(next(os.walk('deployment/assets/database'))[1])
-            print(f"There are {user_counts} users so far!!!")
+            print(f"На данный момент есть {user_counts} пользователей!!!")
 
             # Save user's information to json file
             user_info_path = os.path.join(user_folder.replace(f"database\{user_code}", "info"), f"{user_code}.json")
@@ -116,39 +107,38 @@ def app():
             # Add face cropped to embedding file
             if face is not None:
                 add_embedding(face, user_code)
-                st.success(f'Upload: Successfully Saved Embedding!')
-    
-    elif choice == 'Recognition':
-        st.subheader("Face Recognition")
-        image = st.camera_input("Take a picture")
+                st.success(f'Загружено: встраивание успешно сохранено!')
+
+    elif choice == 'Распознавания':
+        image = st.camera_input("Сделать фото")
         if image is not None:
             image = Image.open(image)
 
             enhace_type = st.sidebar.radio(
-                "Augmentation", ["Original", "Gray-Scale", "Contrast", "Brightness", "Blurring"]
+                "Аугментация", ["Оригинал", "Оттенки серого", "Контраст", "Яркость", "Размытие"]
             )
 
-            if enhace_type == "Gray-Scale":
+            if enhace_type == "Оттенки серого":
                 new_img = np.array(image.convert('RGB'))
                 img = cv2.cvtColor(new_img, 1)
                 result = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 st.image(result)
 
-            elif enhace_type == "Contrast":
-                c_rate = st.sidebar.slider("Contrast", 0.5, 3.5)
+            elif enhace_type == "Контраст":
+                c_rate = st.sidebar.slider("Контраст", 0.5, 3.5)
                 enhacer = ImageEnhance.Contrast(image)
                 result = enhacer.enhance(c_rate)
                 st.image(result)
 
-            elif enhace_type == "Brightness":
-                c_rate = st.sidebar.slider("Brightness", 0.5, 3.5)
+            elif enhace_type == "Яркость":
+                c_rate = st.sidebar.slider("Яркость", 0.5, 3.5)
                 enhacer = ImageEnhance.Brightness(image)
                 result = enhacer.enhance(c_rate)
                 st.image(result)
 
-            elif enhace_type == 'Blurring':
+            elif enhace_type == 'Размытие':
                 new_img = np.array(image.convert('RGB'))
-                blur_rate = st.sidebar.slider('Blurring', 0.5, 3.5)
+                blur_rate = st.sidebar.slider('Размытие', 0.5, 3.5)
                 img = cv2.cvtColor(new_img, 1)
                 result = cv2.GaussianBlur(img, (11, 11), blur_rate)
                 st.image(result)
@@ -156,15 +146,16 @@ def app():
             else:
                 result = image
 
-        if st.button("Process"):
-            with st.spinner(text="🐱‍🏍 Recognizing..."):
+        if st.button("Процесс"):
+            with st.spinner(text="🐱‍🏍 Распознавание..."):
                 data = main(result)
                 st.write(data)
                 st.balloons()
+                # os.remove("recognition.py")
 
-    elif choice == "Realtime Webcam Recognition":
-        st.warning("Note: In order to use this mode, you need to give webcam access.")
-        message = "🐱‍👓 Wait a sec, getting some things done..."
+    elif choice == "Распознавание веб-камеры в реальном времени":
+        st.warning("Внимание: Чтобы использовать этот режим, вам необходимо предоставить доступ к веб-камере.")
+        message = "🐱‍👓 Подождите секунду, кое-что сделать..."
 
         with st.spinner(message):
             class VideoProcessor:

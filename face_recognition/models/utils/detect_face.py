@@ -75,7 +75,7 @@ def detect_face(imgs, minsize, pnet, rnet, onet, threshold, factor, device):
         image_inds.append(image_inds_scale)
 
         pick = batched_nms(boxes_scale[:, :4], boxes_scale[:, 4], image_inds_scale, 0.5)
-        scale_picks.append(pick + offset)
+        scale_picks.append(pick  + offset)
         offset += boxes_scale.shape[0]
 
     boxes = torch.cat(boxes, dim=0)

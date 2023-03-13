@@ -9,6 +9,8 @@ import math
 
 from PIL import Image
 
+import face_recognition.save_embedding
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 mtcnn = MTCNN(
@@ -26,6 +28,7 @@ def recognize(img, get_axes=False):
     print("[INFO] Checking image...")
     name = "Unknown"
     boxes = None
+    out_dist = []
 
     if img is not None:
         t0 = time.time()
@@ -45,7 +48,9 @@ def recognize(img, get_axes=False):
                     for idx, emb_db in enumerate(embedding_list):
                         dist = torch.dist(emb, emb_db).item()
                         dist_list.append(dist)
+                        out_dist.append(dist)
 
+                    # print(dist_list)
                     min_dist = min(dist_list)   # minimum distant value
                     min_dist_idx = dist_list.index(min_dist)
                     name = name_list[min_dist_idx]

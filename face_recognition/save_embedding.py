@@ -1,5 +1,5 @@
-from models.mtcnn import MTCNN
-from models.inception_resnet_v1 import InceptionResnetV1
+from face_recognition.models.mtcnn import MTCNN
+from face_recognition.models.inception_resnet_v1 import InceptionResnetV1
 import torch
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -26,7 +26,7 @@ resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 def collate_fn(x):
     return x[0]
 
-dataset = datasets.ImageFolder("../deployment/assets/database")
+dataset = datasets.ImageFolder("deployment/assets/database")
 dataset.idx_to_class = {i:c for c, i in dataset.class_to_idx.items()}
 loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=worker)
 
@@ -45,5 +45,5 @@ for img, idx in tqdm(loader):
 
 # Save data
 data = [embedding_list, name_list]
-torch.save(data, '../deployment/assets/embedding.pt')
+torch.save(data, 'deployment/assets/embedding.pt')
 print("[INFO] SAVE SUCCESSFUL...!")
